@@ -70,7 +70,9 @@
         check_interval = ?DEFAULT_CHECK_INTERVAL :: non_neg_integer(),
         sync_interval = ?DEFAULT_SYNC_INTERVAL :: non_neg_integer(),
         sync_size = ?DEFAULT_SYNC_SIZE :: non_neg_integer(),
-        last_check = os:timestamp() :: erlang:timestamp()
+        last_check = os:timestamp() :: erlang:timestamp(),
+        global_level :: atom(),
+        global_level_num :: integer()
     }).
 
 -type option() :: {file, string()} | {level, lager:log_level()} |
@@ -119,7 +121,11 @@ init(LogFileConfig) when is_list(LogFileConfig) ->
                     ?INT_LOG(error, "Failed to open log file ~s with error ~s", [Name, file:format_error(Reason)]),
                     State0#state{flap=true}
             end,
-            {ok, State}
+            State2 = case ets:lookup(lager_config, global_level) of
+                       [] -> State#state{global_level = all, global_level_num = lager_util:level_to_num(all)};
+                       [{_, GlobalLevel}] -> State#state{global_level = GlobalLevel, global_level_num = lager_util:level_to_num(GlobalLevel)}
+                     end,
+            {ok, State2}
     end.
 
 %% @private
@@ -150,8 +156,8 @@ handle_call(_Request, State) ->
 
 %% @private
 handle_event({log, Message},
-    #state{name=Name, level=L, shaper=Shaper, formatter=Formatter,formatter_config=FormatConfig} = State) ->
-    case lager_util:is_loggable(Message,L,{lager_file_backend, Name}) of
+    #state{name=Name, level=L, shaper=Shaper, formatter=Formatter,formatter_config=FormatConfig, global_level_num = Global} = State) ->
+    case lager_util:is_loggable(Message,L,{lager_file_backend, Name}) andalso check_global_level(Global, Message) of
         true ->
             case lager_util:check_hwm(Shaper) of
                 {true, Drop, #lager_shaper{hwm=Hwm} = NewShaper} ->
@@ -411,6 +417,14 @@ close_file(#state{fd=FD} = State) ->
     _ = file:datasync(FD),
     _ = file:close(FD),
     State#state{fd=undefined}.
+
+
+check_global_level(LevelInt, Msg) ->
+  MessageLevel = lager_msg:severity_as_int(Msg),
+  case is_integer(LevelInt) of
+    false -> true;
+    true -> MessageLevel =< LevelInt
+  end.
 
 -ifdef(TEST).
 

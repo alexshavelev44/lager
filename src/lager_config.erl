@@ -43,6 +43,10 @@ new() ->
     new_sink(?DEFAULT_SINK),
     %% Need to be able to find the `lager_handler_watcher' for all handlers
     ets:insert_new(?TBL, {{?GLOBAL, handlers}, []}),
+    case application:get_env(lager, global_level) of
+        undefined -> skip;
+        Val -> ets:insert(?TBL, {global_level, Val})
+    end,
     ok.
 
 new_sink(Sink) ->
