@@ -234,6 +234,8 @@ boot() ->
     _ = maybe_install_sink_killer(?DEFAULT_SINK, get_env(lager, killer_hwm), 
                               get_env(lager, killer_reinstall_after)),
 
+  lists:foreach(fun(H) -> error_logger:error_msg("handlers boot ~p~n", [H]) end, get_env(lager, handlers, ?DEFAULT_HANDLER_CONF)),
+
     start_handlers(?DEFAULT_SINK,
                    get_env(lager, handlers, ?DEFAULT_HANDLER_CONF)),
 
