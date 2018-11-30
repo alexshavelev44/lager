@@ -45,7 +45,7 @@ new() ->
     ets:insert_new(?TBL, {{?GLOBAL, handlers}, []}),
     case application:get_env(lager, global_level) of
         undefined -> skip;
-        Val -> ets:insert(?TBL, {global_level, Val})
+        {ok, Val} -> ets:insert(?TBL, {global_level, Val})
     end,
     ok.
 
