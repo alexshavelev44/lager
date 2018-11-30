@@ -81,7 +81,10 @@ start_handlers(_Sink, Handlers) when not is_list(Handlers) ->
     throw({error, bad_config});
 start_handlers(Sink, Handlers) ->
     %% handlers failing to start are handled in the handler_watcher
-    error_logger:error_msg("handlers ~p~n", [expand_handlers(Handlers)]),
+    
+
+    lists:foreach(fun(H) -> error_logger:error_msg("handlers ~p~n", [H]) end, expand_handlers(Handlers)),
+
     lager_config:global_set(handlers,
                             lager_config:global_get(handlers, []) ++
                             lists:map(fun({Module, Config}) ->
