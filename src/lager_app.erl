@@ -236,8 +236,33 @@ boot() ->
 
   lists:foreach(fun(H) -> error_logger:error_msg("handlers boot ~p~n", [H]) end, get_env(lager, handlers, ?DEFAULT_HANDLER_CONF)),
 
-    start_handlers(?DEFAULT_SINK,
-                   get_env(lager, handlers, ?DEFAULT_HANDLER_CONF)),
+
+  Handlers = get_env(lager, handlers, ?DEFAULT_HANDLER_CONF),
+  Handlers2 =
+    case application:get_env(lager,global_level) of
+      undefined -> Handlers;
+      {ok, GlobalVal} ->
+        IntGlobalVal = lager_util:level_to_num(GlobalVal),
+        lists:foldr(fun(Handler, Acc) ->
+
+          case Handler of
+            {lager_file_backend, Options} ->
+              Level = proplists:get_value(level, Options, all),
+              IntLevel = lager_util:level_to_num(Level),
+              case IntLevel =< IntGlobalVal of
+                false -> Acc;
+                true -> [Handler | Acc]
+              end;
+            _ -> [Handler | Acc]
+          end
+
+        end, [], Handlers)
+    end,
+
+  start_handlers(?DEFAULT_SINK, Handlers2),
+
+%%    start_handlers(?DEFAULT_SINK,
+%%                   get_env(lager, handlers, ?DEFAULT_HANDLER_CONF)),
 
     lager:update_loglevel_config(?DEFAULT_SINK),
 
