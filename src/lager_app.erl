@@ -82,7 +82,9 @@ start_handlers(_Sink, Handlers) when not is_list(Handlers) ->
 start_handlers(Sink, Handlers) ->
     %% handlers failing to start are handled in the handler_watcher
 
-    lists:foreach(fun(H) -> error_logger:error_msg("handlers ~p~n", [H]) end, expand_handlers(Handlers)),
+    lists:foreach(fun(H) -> error_logger:error_msg("sink ~p handlers ~p~n", [Sink, H]) end, expand_handlers(Handlers)),
+
+    lists:foreach(fun(H) -> error_logger:error_msg("handlers ~p~n", [Sink, H]) end, lager_config:global_get(handlers, [])),
 
     lager_config:global_set(handlers,
                             lager_config:global_get(handlers, []) ++
