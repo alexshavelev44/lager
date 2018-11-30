@@ -82,9 +82,9 @@ start_handlers(_Sink, Handlers) when not is_list(Handlers) ->
 start_handlers(Sink, Handlers) ->
     %% handlers failing to start are handled in the handler_watcher
 
-    lists:foreach(fun(H) -> error_logger:error_msg("sink ~p handlers ~p~n", [Sink, H]) end, expand_handlers(Handlers)),
+%%    lists:foreach(fun(H) -> error_logger:error_msg("sink ~p handlers ~p~n", [Sink, H]) end, expand_handlers(Handlers)),
 
-    lists:foreach(fun(H) -> error_logger:error_msg("handlers ~p~n", [Sink, H]) end, lager_config:global_get(handlers, [])),
+%%    lists:foreach(fun(H) -> error_logger:error_msg("handlers ~p~n", [Sink, H]) end, lager_config:global_get(handlers, [])),
 
     lager_config:global_set(handlers,
                             lager_config:global_get(handlers, []) ++
@@ -234,7 +234,7 @@ boot() ->
     _ = maybe_install_sink_killer(?DEFAULT_SINK, get_env(lager, killer_hwm), 
                               get_env(lager, killer_reinstall_after)),
 
-  lists:foreach(fun(H) -> error_logger:error_msg("handlers boot ~p~n", [H]) end, get_env(lager, handlers, ?DEFAULT_HANDLER_CONF)),
+%%  lists:foreach(fun(H) -> error_logger:error_msg("handlers boot ~p~n", [H]) end, get_env(lager, handlers, ?DEFAULT_HANDLER_CONF)),
 
 
   Handlers = get_env(lager, handlers, ?DEFAULT_HANDLER_CONF),
