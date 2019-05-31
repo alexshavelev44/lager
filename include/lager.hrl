@@ -22,12 +22,12 @@
 
 
 -define(LEVELS,
-    [all, trace, debug, info, notice, warning, error, critical, alert, emergency, none]).
+    [all, trace, debug, info, notice, warning, error, critical, alert, fatal, emergency, none]).
 
 %% Use of these "functions" means that the argument list will not be
 %% truncated for safety
 -define(LEVELS_UNSAFE,
-    [{all_unsafe, all}, {trace_unsafe, trace},{debug_unsafe, debug}, {info_unsafe, info}, {notice_unsafe, notice}, {warning_unsafe, warning}, {error_unsafe, error}, {critical_unsafe, critical}, {alert_unsafe, alert}, {emergency_unsafe, emergency}]).
+    [{all_unsafe, all}, {trace_unsafe, trace},{debug_unsafe, debug}, {info_unsafe, info}, {notice_unsafe, notice}, {warning_unsafe, warning}, {error_unsafe, error}, {critical_unsafe, critical}, {fatal_unsafe, fatal}, {alert_unsafe, alert}, {emergency_unsafe, emergency}]).
 
 -define(ALL, 2147483647).
 -define(TRACE, 256).
@@ -37,6 +37,7 @@
 -define(WARNING, 16).
 -define(ERROR, 8).
 -define(CRITICAL, 4).
+-define(FATAL, 3).
 -define(ALERT, 2).
 -define(EMERGENCY, 1).
 -define(LOG_NONE, 0).
@@ -51,6 +52,7 @@
         warning -> ?WARNING;
         error -> ?ERROR;
         critical -> ?CRITICAL;
+        fatal -> ?FATAL;
         alert -> ?ALERT;
         emergency -> ?EMERGENCY
     end).
@@ -65,6 +67,7 @@
         ?WARNING -> warning;
         ?ERROR -> error;
         ?CRITICAL -> critical;
+        ?FATAL -> fatal;
         ?ALERT -> alert;
         ?EMERGENCY -> emergency
     end).
