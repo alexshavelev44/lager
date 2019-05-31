@@ -209,21 +209,21 @@ log_event(Event, #state{sink=Sink} = State) ->
             end;
         {error_report, _GL, {Pid, std_error, D}} ->
             ?CRASH_LOG(Event),
-            ?LOGMSG(Sink, error, Pid, print_silly_list(D));
+            ?LOGMSG(Sink, fatal, Pid, print_silly_list(D));
         {error_report, _GL, {Pid, supervisor_report, D}} ->
             ?CRASH_LOG(Event),
             case lists:sort(D) of
                 [{errorContext, Ctx}, {offender, Off}, {reason, Reason}, {supervisor, Name}] ->
                     Offender = format_offender(Off),
-                    ?LOGFMT(Sink, error, Pid,
+                    ?LOGFMT(Sink, fatal, Pid,
                         "Supervisor ~w had child ~s exit with reason ~s in context ~w",
                         [supervisor_name(Name), Offender, format_reason(Reason), Ctx]);
                 _ ->
-                    ?LOGMSG(Sink, error, Pid, "SUPERVISOR REPORT " ++ print_silly_list(D))
+                    ?LOGMSG(Sink, fatal, Pid, "SUPERVISOR REPORT " ++ print_silly_list(D))
             end;
         {error_report, _GL, {Pid, crash_report, [Self, Neighbours]}} ->
             ?CRASH_LOG(Event),
-            ?LOGMSG(Sink, error, Pid, "CRASH REPORT " ++ format_crash_report(Self, Neighbours));
+            ?LOGMSG(Sink, fatal, Pid, "CRASH REPORT " ++ format_crash_report(Self, Neighbours));
         {warning_msg, _GL, {Pid, Fmt, Args}} ->
             ?LOGFMT(Sink, warning, Pid, Fmt, Args);
         {warning_report, _GL, {Pid, std_warning, Report}} ->
