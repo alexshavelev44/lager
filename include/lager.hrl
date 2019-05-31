@@ -22,7 +22,7 @@
 
 
 -define(LEVELS,
-    [all, trace, debug, info, notice, warning, error, critical, alert, fatal, emergency, none]).
+    [all, trace, debug, info, notice, warning, error, critical, fatal, alert, emergency, none]).
 
 %% Use of these "functions" means that the argument list will not be
 %% truncated for safety
