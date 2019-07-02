@@ -514,7 +514,9 @@ safe_format(Fmt, Args, Limit) ->
 safe_format(Fmt, Args, Limit, Options) ->
     try lager_trunc_io:format(Fmt, Args, Limit, Options)
     catch
-        _:_ -> lager_trunc_io:format("FORMAT ERROR: ~p ~p", [Fmt, Args], Limit)
+        _:_ ->
+          spawn(lager, log, [info, [], "format error stacktrace ~p~n", [erlang:get_stacktrace()]]),
+          lager_trunc_io:format("FORMAT ERROR: ~p ~p", [Fmt, Args], Limit)
     end.
 
 %% @private
